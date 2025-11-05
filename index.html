@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Destro — Fresh & Organic Fruits (Green Theme)</title>
+  <style>
+    /* ---------- RESET & GLOBAL ---------- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root{
+      --accent:#2f9e58;       /* primary green */
+      --accent-600:#2aa44a;
+      --accent-dark:#1f7a38;
+      --bg:#f6fff4;          /* very light green background */
+      --muted:#6b6b6b;
+      --dark:#0b2b17;
+      --gold:#ffce00;
+      --card:#ffffff;
+      --glass: rgba(47,158,88,0.06);
+    }
+    body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: var(--bg);
+      color: var(--dark);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.45;
+      padding-bottom: 120px;
+    }
+    a { color: inherit; text-decoration:none; }
+
+    /* ---------- HEADER ---------- */
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      padding:16px 28px;
+      background: linear-gradient(90deg,#f0fff4,#e8f9ea);
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      position:sticky;
+      top:0;
+      z-index:40;
+    }
+    .logo {display:flex; align-items:center; gap:12px;}
+    .logo img{width:48px; height:48px; border-radius:10px; object-fit:cover; border:2px solid rgba(47,158,88,0.12);}
+    .logo h1{font-size:20px; letter-spacing:0.3px; color:var(--accent-dark);}
+    nav ul{display:flex; gap:18px; list-style:none;}
+    nav a{font-weight:600; color:var(--dark);}
+
+    /* cart icon */
+    .cart-btn{
+      position:relative;
+      background:transparent;
+      border:1px solid rgba(47,158,88,0.08);
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      color:var(--accent-dark);
+      transition: transform .12s;
+    }
+    .cart-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(47,158,88,0.08); }
+    .cart-badge{
+      position:absolute;
+      top:-6px;
+      right:-6px;
+      background:var(--accent-dark);
+      color:#fff;
+      font-size:12px;
+      padding:4px 6px;
+      border-radius:999px;
+      font-weight:700;
+      box-shadow:0 2px 6px rgba(0,0,0,0.12);
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      padding:36px 20px;
+      text-align:center;
+      background:linear-gradient(90deg,var(--accent),#66c97a);
+      color:#fff;
+      border-bottom-left-radius:18px;
+      border-bottom-right-radius:18px;
+      margin:16px;
+    }
+    .hero h2{font-size:28px; margin-bottom:8px;}
+    .hero p{max-width:760px; margin:0 auto 12px; opacity:0.95;}
+    .controls {
+      max-width:1100px; margin:18px auto 0; display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap;
+    }
+
+    .search-input {
+      display:flex; gap:8px; align-items:center;
+      background:var(--card); padding:8px 10px; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,0.04);
+    }
+    .search-input input {
+      border:0; outline:none; font-size:14px; padding:6px; width:260px;
+    }
+    .select, .page-size {
+      background:var(--card); border-radius:10px; padding:8px; border:0; box-shadow:0 6px 16px rgba(0,0,0,0.04); cursor:pointer;
+    }
+
+    /* ---------- PRODUCTS ---------- */
+    .products{padding:24px 20px; max-width:1100px; margin:0 auto;}
+    .products h2{font-size:22px; margin-bottom:12px; color:var(--accent-dark);}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+      gap:16px;
+    }
+    .card{
+      background:linear-gradient(180deg,var(--card),#f8fff6);
+      border-radius:12px;
+      padding:12px;
+      box-shadow:0 10px 24px rgba(47,158,88,0.06);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      border:1px solid rgba(47,158,88,0.04);
+    }
+    .card .media{height:140px; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--glass);}
+    .card img{width:100%; height:100%; object-fit:cover; transition: transform .2s ease;}
+    .card img:hover{ transform: scale(1.03); }
+    .card h3{font-size:16px; color:var(--dark);}
+    .price-row{display:flex; justify-content:space-between; align-items:center; gap:12px;}
+    .price{font-weight:700; color:var(--accent-dark);}
+    .add-btn{
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      padding:8px 10px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .add-btn:active{transform:translateY(1px); box-shadow:0 2px 6px rgba(0,0,0,0.08);}
+    .meta{color:var(--muted); font-size:13px}
+
+    /* pagination */
+    .pagination { display:flex; gap:8px; justify-content:center; align-items:center; margin-top:18px; flex-wrap:wrap; }
+    .page-btn{ background:var(--card); border-radius:8px; padding:6px 10px; box-shadow:0 6px 16px rgba(0,0,0,0.04); cursor:pointer; border:0; color:var(--dark); }
+    .page-btn.active{ background:var(--accent); color:#fff; font-weight:700; }
+
+    /* ---------- FOOTER ---------- */
+    footer{background:var(--accent-dark);color:#fff;padding:34px 20px;margin-top:40px;}
+    .footer-grid{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between;max-width:1100px;margin:0 auto;}
+    .footer-about{max-width:340px;}
+    .footer-about h2{margin-bottom:6px;color:#fff;}
+    .footer-links{min-width:160px;}
+    .footer-links ul{list-style:none; margin-top:6px;}
+    .footer-links li{margin:10px 0; display:flex; align-items:center; gap:10px;}
+    .fruit-emoji{display:inline-block; transform-origin:center; font-size:18px;}
+    @keyframes floaty { 0%{transform:translateY(0) rotate(0);} 50%{transform:translateY(-6px) rotate(6deg);} 100%{transform:translateY(0) rotate(0);} }
+    .fruit-emoji.apple{animation: floaty 2.8s ease-in-out infinite;}
+    .fruit-emoji.orange{animation: floaty 2.4s ease-in-out infinite;}
+    .fruit-emoji.grape{animation: floaty 3.0s ease-in-out infinite;}
+    .footer-bottom{opacity:0.95; margin-top:22px; font-size:14px; text-align:center;}
+
+    /* ---------- CART SIDEBAR (Green Organic Theme) ---------- */
+    .cart-sidebar{
+      position:fixed; top:0; right:-360px; height:100vh; width:360px; max-width:92%;
+      background:#06311a; color:#e6f6ea; padding:20px; transition:right .32s cubic-bezier(.2,.9,.25,1);
+      z-index:200; display:flex; flex-direction:column; border-left:3px solid #2aa44a; box-shadow: -8px 0 30px rgba(42,164,74,0.12);
+    }
+    .cart-sidebar.open{ right:0; }
+    .cart-header{ padding:12px 6px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--accent); display:flex; justify-content:space-between; align-items:center; }
+    .cart-header strong{ color:#b8f2c6; }
+    .cart-items{padding:12px; overflow:auto; flex:1;}
+    .cart-footer{ padding:16px; border-top:1px solid rgba(255,255,255,0.04); background:transparent; color:#e6f6ea;}
+    .close-cart{ background:transparent; border:0; font-weight:700; cursor:pointer; color:#b8f2c6; }
+    .cart-item{ display:flex; gap:10px; padding:12px 6px; border-radius:10px; align-items:center; margin-bottom:10px; background:#0b2b18; }
+    .cart-item img{ width:64px; height:64px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.04); }
+    .ci-info{flex:1;}
+    .ci-name{ font-weight:700; font-size:15px; margin-bottom:6px; color:#b8f2c6; }
+    .ci-price{ color:#b8f2c6; font-weight:700; margin-bottom:8px;}
+    .qty-controls{ display:flex; gap:8px; align-items:center; }
+    .qty-controls button{ padding:6px 8px; border-radius:8px; border:1px solid #2aa44a; background:#06311a; color:#b8f2c6; cursor:pointer; font-weight:700; }
+    .remove-btn{ background:transparent; color:#ff6b6b; border:0; font-weight:700; cursor:pointer; font-size:13px; margin-left:6px; }
+
+    .total-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-weight:800; font-size:18px; color:#b8f2c6; }
+    .checkout-btn{ background:#2aa44a; color:#06311a; border:0; width:100%; padding:12px; border-radius:12px; font-weight:800; cursor:pointer; }
+    .empty-note{ text-align:center; color:#9fcfa0; padding:18px 8px; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width:800px){
+      nav ul{ display:none; } /* keep header minimal on small screens */
+      .hero h2{ font-size:26px; }
+      .cart-sidebar{ width:100%; max-width:420px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo" aria-label="Destro logo">
+      <img src="https://i.imgur.com/yZ4jpsb.png" alt="Destro logo">
+      <div>
+        <h1>Destro</h1>
+        <div style="font-size:12px;color:var(--muted)">Fresh & Organic Fruits</div>
+      </div>
+    </div>
+
+    <nav aria-label="Primary navigation">
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#products">Products</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="cart-btn" id="openCart" aria-haspopup="dialog" aria-controls="cartSidebar" title="Open cart">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M6 6h15l-1.5 9h-12L6 6z" stroke="#1f7a38" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1" fill="#1f7a38"/><circle cx="18" cy="20" r="1" fill="#1f7a38"/></svg>
+        <span>Cart</span>
+        <span class="cart-badge" id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home" aria-label="Intro">
+    <h2>Fresh, Juicy, and 100% Organic Fruits</h2>
+    <p>At Destro we bring you nature’s best — handpicked fruits delivered fresh from trusted farms. Browse, add to cart, and enjoy!</p>
+
+    <div class="controls" role="region" aria-label="Product controls">
+      <div class="search-input" title="Search products">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35" stroke="#888" stroke-width="1.6" stroke-linecap="round"></path><circle cx="11" cy="11" r="6" stroke="#888" stroke-width="1.2" fill="none"></circle></svg>
+        <input id="searchBox" placeholder="Search fruits (e.g. apple, grape)..." aria-label="Search products">
+        <button class="select" id="clearSearch" title="Clear search">Clear</button>
+      </div>
+
+      <select id="categorySelect" class="select" aria-label="Filter category">
+        <option value="all">All Categories</option>
+        <option value="citrus">Citrus</option>
+        <option value="tropical">Tropical</option>
+        <option value="berries">Berries</option>
+        <option value="others">Others</option>
+      </select>
+
+      <select id="pageSizeSelect" class="page-size" aria-label="Items per page">
+        <option value="6">6 per page</option>
+        <option value="8" selected>8 per page</option>
+        <option value="12">12 per page</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <main class="products" id="products" aria-live="polite">
+    <h2>Our Fruits</h2>
+    <div class="grid" id="productGrid">
+      <!-- rendered by JS -->
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="contact" aria-label="Footer">
+    <div class="footer-grid">
+      <div class="footer-about">
+        <h2>Destro</h2>
+        <p style="opacity:0.9; margin-top:6px;">Your one-stop destination for fresh & organic fruits — delivered straight from farms to your table.</p>
+      </div>
+
+      <div class="footer-links" aria-label="Footer links">
+        <h3 style="color:#fff; margin-bottom:8px;">Quick Links</h3>
+        <ul>
+          <li><span class="fruit-emoji apple" aria-hidden="true">🍎</span><a href="#home">Home</a></li>
+          <li><span class="fruit-emoji orange" aria-hidden="true">🍊</span><a href="#about">About</a></li>
+          <li><span class="fruit-emoji grape" aria-hidden="true">🍇</span><a href="#products">Product</a></li>
+          <li><span class="fruit-emoji apple" aria-hidden="true">🍎</span><a href="#contact">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div style="min-width:240px;">
+        <h3 style="color:#fff; margin-bottom:8px;">Find Us</h3>
+        <iframe title="Destro location" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.0592722071067!2d-122.41941528468158!3d37.774929279759135!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064df8f9c23%3A0x5041af0a03547dec!2sFruit%20Store!5e0!3m2!1sen!2sus!4v1610000000000!5m2!1sen!2sus" width="100%" height="140" style="border:0;border-radius:10px" loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <div class="footer-bottom">© 2025 Destro — All Rights Reserved</div>
+  </footer>
+
+  <!-- CART SIDEBAR (Green theme) -->
+  <aside id="cartSidebar" class="cart-sidebar" role="dialog" aria-label="Shopping cart" aria-hidden="true">
+    <div class="cart-header">
+      <strong>Your Cart</strong>
+      <div>
+        <button class="close-cart" id="closeCart" aria-label="Close cart">Close ✕</button>
+      </div>
+    </div>
+
+    <div class="cart-items" id="cartItems">
+      <!-- JS will populate cart items here -->
+    </div>
+
+    <div class="cart-footer">
+      <div class="total-row">
+        <div>Total</div>
+        <div id="cartTotal">₹0</div>
+      </div>
+      <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+      <div style="margin-top:8px; text-align:center;"><button id="clearCartBtn" style="background:transparent;border:0;color:var(--muted);cursor:pointer">Clear Cart</button></div>
+    </div>
+  </aside>
+
+  <!-- ----------------- SCRIPTS ----------------- -->
+  <script>
+/* ---------- Catalog + filtering + pagination + cart (Green theme) ---------- */
+
+// sample product data (expanded)
+const PRODUCTS = [
+  { id: 'apple-01', name: 'Red Apple', price: 60, img: 'https://i.imgur.com/5YbZzqz.jpg', category: 'others', desc: 'Crisp, sweet & full of vitamins.'},
+  { id: 'orange-01', name: 'Sweet Orange', price: 50, img: 'https://i.imgur.com/CXx0TKU.jpg', category: 'citrus', desc: 'Juicy and packed with Vitamin C.'},
+  { id: 'banana-01', name: 'Yellow Banana', price: 40, img: 'https://i.imgur.com/HKQ4z6E.jpg', category: 'tropical', desc: 'Perfect energy snack, rich in potassium.'},
+  { id: 'grapes-01', name: 'Green Grapes', price: 120, img: 'https://i.imgur.com/QDf6R6n.jpg', category: 'berries', desc: 'Fresh bunches bursting with flavor.'},
+  { id: 'mango-01', name: 'Alphonso Mango', price: 180, img: 'https://i.imgur.com/1kzH0Nv.jpg', category: 'tropical', desc: 'King of fruits, super sweet.'},
+  { id: 'lemon-01', name: 'Fresh Lemon', price: 20, img: 'https://i.imgur.com/0Qm6s3W.jpg', category: 'citrus', desc: 'Sour & zesty.'},
+  { id: 'pineapple-01', name: 'Pineapple', price: 150, img: 'https://i.imgur.com/6M8eQw2.jpg', category: 'tropical', desc: 'Tangy & tropical.'},
+  { id: 'strawberry-01', name: 'Strawberry', price: 200, img: 'https://i.imgur.com/3rBCZ2k.jpg', category: 'berries', desc: 'Sweet and fragrant.'},
+  { id: 'kiwi-01', name: 'Green Kiwi', price: 90, img: 'https://i.imgur.com/wN4t6rU.jpg', category: 'others', desc: 'Tart and nutritious.'},
+  { id: 'papaya-01', name: 'Papaya', price: 70, img: 'https://i.imgur.com/O2f6tYt.jpg', category: 'tropical', desc: 'Smooth & soft texture.'},
+  { id: 'blueberry-01', name: 'Blueberry', price: 250, img: 'https://i.imgur.com/z5sF4vW.jpg', category: 'berries', desc: 'Tiny antioxidant powerhouses.'},
+  { id: 'pomegranate-01', name: 'Pomegranate', price: 160, img: 'https://i.imgur.com/8i7Bv2G.jpg', category: 'others', desc: 'Juicy ruby seeds.'},
+  { id: 'watermelon-01', name: 'Watermelon', price: 120, img: 'https://i.imgur.com/7GqQk0S.jpg', category: 'others', desc: 'Refreshing & hydrating.'},
+  { id: 'mandarin-01', name: 'Mandarin', price: 55, img: 'https://i.imgur.com/2QF1s7W.jpg', category: 'citrus', desc: 'Sweet little citrus.'},
+  { id: 'avocado-01', name: 'Avocado', price: 140, img: 'https://i.imgur.com/9Kq7wX7.jpg', category: 'others', desc: 'Creamy and healthy fats.'}
+];
+
+// DOM references
+const productGrid = document.getElementById('productGrid');
+const paginationEl = document.getElementById('pagination');
+const searchBox = document.getElementById('searchBox');
+const clearSearch = document.getElementById('clearSearch');
+const categorySelect = document.getElementById('categorySelect');
+const pageSizeSelect = document.getElementById('pageSizeSelect');
+
+// cart
+const cartKey = 'destro_cart_v2';
+const cartItemsEl = document.getElementById('cartItems');
+const cartTotalEl = document.getElementById('cartTotal');
+const cartCountEl = document.getElementById('cartCount');
+const openCartBtn = document.getElementById('openCart');
+const closeCartBtn = document.getElementById('closeCart');
+const cartSidebar = document.getElementById('cartSidebar');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const clearCartBtn = document.getElementById('clearCartBtn');
+
+let cart = loadCart(); 
+let currentPage = 1;
+let pageSize = Number(pageSizeSelect.value);
+
+// helpers
+function escapeHtml(txt){
+  return txt.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function loadCart(){
+  try {
+    const raw = localStorage.getItem(cartKey);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){
+    return {};
+  }
+}
+function saveCart(){
+  localStorage.setItem(cartKey, JSON.stringify(cart));
+}
+function formatCurrency(n){ return '₹' + Number(n).toFixed(0); }
+
+// Filtering & pagination
+function getFilteredProducts(){
+  const q = (searchBox.value || '').trim().toLowerCase();
+  const cat = categorySelect.value;
+  return PRODUCTS.filter(p => {
+    const matchQ = q === '' || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
+    const matchC = cat === 'all' || p.category === cat;
+    return matchQ && matchC;
+  });
+}
+
+function renderProducts(){
+  const filtered = getFilteredProducts();
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * pageSize;
+  const items = filtered.slice(start, start + pageSize);
+
+  productGrid.innerHTML = items.map(p => `
+    <article class="card">
+      <div class="media"><img src="${p.img}" alt="${escapeHtml(p.name)}"></div>
+      <h3>${escapeHtml(p.name)}</h3>
+      <div class="meta">${escapeHtml(p.desc)}</div>
+      <div class="price-row">
+        <div class="price">${formatCurrency(p.price)}</div>
+        <button class="add-btn" onclick="addToCart({id:'${p.id}',name:'${escapeHtml(p.name)}',price:${p.price},img:'${p.img}'})">Add to Cart</button>
+      </div>
+    </article>
+  `).join('');
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+  let html = `<button class="page-btn" onclick="changePage('prev')">Prev</button>`;
+  for(let i=1;i<=totalPages;i++){
+    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="changePage(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" onclick="changePage('next')">Next</button>`;
+  paginationEl.innerHTML = html;
+}
+
+function changePage(v){
+  const filtered = getFilteredProducts();
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  if (v === 'prev') currentPage = Math.max(1, currentPage - 1);
+  else if (v === 'next') currentPage = Math.min(totalPages, currentPage + 1);
+  else currentPage = v;
+  renderProducts();
+}
+
+// CART FUNCTIONS
+function addToCart(item){
+  if(!cart[item.id]) cart[item.id] = {...item, qty:1};
+  else cart[item.id].qty++;
+  saveCart();
+  updateCartCount();
+  renderCartItems();
+}
+
+function updateCartCount(){
+  cartCountEl.textContent = Object.values(cart).reduce((s,i)=>s+i.qty,0);
+}
+function recalcTotal(){
+  cartTotalEl.textContent = formatCurrency(Object.values(cart).reduce((s,i)=>s+i.qty*i.price,0));
+}
+
+function renderCartItems(){
+  const items = Object.values(cart);
+  cartItemsEl.innerHTML = items.length ? '' : `<div class="empty-note">Your cart is empty 🍎</div>`;
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className='cart-item';
+    div.innerHTML = `
+      <img src="${item.img}">
+      <div class="ci-info">
+        <div class="ci-name">${escapeHtml(item.name)}</div>
+        <div class="ci-price">${formatCurrency(item.price)}</div>
+        <div class="qty-controls">
+          <button onclick="changeQty('${item.id}',-1)">-</button>
+          <span style="min-width:30px; text-align:center;">${item.qty}</span>
+          <button onclick="changeQty('${item.id}',1)">+</button>
+          <button class="remove-btn" onclick="removeItem('${item.id}')">Remove</button>
+        </div>
+      </div>`;
+    cartItemsEl.appendChild(div);
+  });
+  recalcTotal();
+  updateCartCount();
+}
+
+function changeQty(id,delta){
+  if(!cart[id]) return;
+  cart[id].qty += delta;
+  if(cart[id].qty<=0) delete cart[id];
+  saveCart();
+  renderCartItems();
+}
+
+function removeItem(id){
+  delete cart[id];
+  saveCart();
+  renderCartItems();
+}
+
+function clearCart(){
+  cart = {}; saveCart(); renderCartItems();
+}
+
+// Sidebar Control
+openCartBtn.onclick = () => { cartSidebar.classList.add('open'); renderCartItems(); };
+closeCartBtn.onclick = () => { cartSidebar.classList.remove('open'); };
+clearCartBtn.onclick = clearCart;
+
+checkoutBtn.onclick = () => {
+  window.location.href = "checkout.html";  // redirect to address page
+};
+
+// UI Events
+searchBox.oninput = () => { currentPage=1; renderProducts(); };
+clearSearch.onclick = () => { searchBox.value=''; renderProducts(); };
+categorySelect.onchange = () => { currentPage=1; renderProducts(); };
+pageSizeSelect.onchange = () => { pageSize = Number(pageSizeSelect.value); currentPage=1; renderProducts(); };
+
+// initial load
+renderProducts();
+renderCartItems();
+updateCartCount();
+</script>
+
+</body>
+</html>
