@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Successful | Destro Fruits</title>
+<style>
+body{
+  background:#dfffe0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+  font-family:Arial;
+  overflow:hidden;
+}
+h1{color:#1e7a38;font-size:32px;}
+p{color:#333;font-size:18px;margin-top:10px;}
+.btn{
+  background:#1e7a38;
+  padding:12px 26px;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:17px;
+  margin:10px 5px 0 5px;
+  cursor:pointer;
+}
+.btn:hover{opacity:.9;}
+#fireworks{
+ position:fixed;top:0;left:0;
+ width:100%;height:100%;z-index:-1;
+}
+</style>
+</head>
+<body>
+
+<h1>✅ Payment Successful!</h1>
+<p>Your order has been placed successfully.</p>
+
+<div>
+  <button class="btn" onclick="downloadPDF()">Download Invoice</button>
+  <button class="btn" onclick="window.location.href='index.html'">Continue Shopping</button>
+  <button class="btn" onclick="window.location.href='orders.html'" target="_blank">View Orders</button>
+  <button class="btn" onclick="window.location.href='track.html'" target="_blank">Track Order</button>
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<!-- jsPDF + AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+const cartKey="destro_cart_v2";
+const userKey="destro_user_info";
+let cart = JSON.parse(localStorage.getItem(cartKey)) || {};
+let user = JSON.parse(localStorage.getItem(userKey)) || {};
+
+// Generate Order ID
+let orderId = "DESTRO-" + Math.floor(100000 + Math.random() * 900000);
+
+// GST & Total
+let total = 0;
+let items = [];
+Object.values(cart).forEach(i=>{
+  let amt = i.qty * i.price;
+  items.push([i.name, i.qty, "₹"+i.price, "₹"+amt]);
+  total += amt;
+});
+let cgst = total*0.09;
+let sgst = total*0.09;
+let grand = total + cgst + sgst;
+
+// Save Order in localStorage
+let orders = JSON.parse(localStorage.getItem("destro_orders")||"[]");
+let order = {
+  id: orderId,
+  date: new Date().toLocaleDateString(),
+  status: "Pending",
+  total: grand.toFixed(0),
+  items: Object.values(cart).map(i=>({name:i.name, qty:i.qty, price:i.price})),
+  customer: user
+};
+orders.push(order);
+localStorage.setItem("destro_orders", JSON.stringify(orders));
+
+// Generate PDF
+function downloadPDF(){
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+
+  doc.setFontSize(20);
+  doc.text("DESTRO | TAX INVOICE",14,14);
+
+  doc.setFontSize(11);
+  doc.text(`Order ID : ${orderId}`,14,24);
+  doc.text(`Invoice Date : ${new Date().toLocaleDateString()}`,14,30);
+  doc.text(`GSTIN : 02ABCDE1234F2Z5`,14,36);
+
+  // Seller Details
+  doc.setFontSize(12);
+  doc.text("Seller:",14,48);
+  doc.setFontSize(10);
+  doc.text([
+    "DESTRO Pvt. Ltd.",
+    "Sector 62, Noida, Uttar Pradesh - 201301",
+    "Phone: +91 9876543210"
+  ],14,54);
+
+  // Buyer Details
+  doc.setFontSize(12);
+  doc.text("Billing To:",120,48);
+  doc.setFontSize(10);
+  doc.text([
+    user.name,
+    user.address,
+    `${user.city} - ${user.pincode}`,
+    `Mobile: ${user.mobile}`
+  ],120,54);
+
+  // Product Table
+  doc.autoTable({
+    head:[["Product","Qty","Rate","Amount"]],
+    body:items,
+    startY:90
+  });
+
+  let Y = doc.lastAutoTable.finalY + 10;
+  doc.text(`Subtotal: ₹${total.toFixed(0)}`,140,Y);
+  doc.text(`CGST (9%): ₹${cgst.toFixed(0)}`,140,Y+7);
+  doc.text(`SGST (9%): ₹${sgst.toFixed(0)}`,140,Y+14);
+  doc.setFontSize(13);
+  doc.text(`Grand Total: ₹${grand.toFixed(0)}`,140,Y+26);
+
+  // Footer message
+  doc.setFontSize(14);
+  doc.text("Thank you for your purchase! Have a great day! 🍏🍇",14,Y+45);
+
+  doc.save(`DESTRO-Invoice-${orderId}.pdf`);
+}
+
+// Auto Download PDF on page load
+downloadPDF();
+
+// Clear Cart
+localStorage.removeItem(cartKey);
+
+// Fireworks Animation
+let canvas=document.getElementById('fireworks');
+let ctx=canvas.getContext('2d');
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+let sparks=[];
+
+function explosion(x,y){
+ for(let i=0;i<35;i++){
+   sparks.push({x,y,vx:Math.random()*4-2,vy:Math.random()*4-2,alpha:1});
+ }
+}
+
+setInterval(()=>explosion(Math.random()*canvas.width,Math.random()*canvas.height/2),600);
+
+function animate(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ sparks.forEach((p,i)=>{
+   p.x+=p.vx; p.y+=p.vy; p.alpha-=0.02;
+   ctx.fillStyle=`rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255},${p.alpha})`;
+   ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill();
+   if(p.alpha<=0) sparks.splice(i,1);
+ });
+ requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
