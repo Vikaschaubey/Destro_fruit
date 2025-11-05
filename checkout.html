@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout – Delivery Address | Destro Fruits</title>
+
+<style>
+  :root{
+    --accent:#2f9e58;
+    --accent-dark:#1f7a38;
+    --bg:#f6fff4;
+    --card:#ffffff;
+    --muted:#666;
+  }
+
+  body{
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    padding: 20px;
+  }
+
+  h1{
+    text-align:center;
+    margin-bottom:20px;
+    color: var(--accent-dark);
+  }
+
+  .container{
+    max-width:900px;
+    margin:0 auto;
+    background: var(--card);
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    display:flex;
+    gap:25px;
+    flex-wrap:wrap;
+  }
+
+  /* Address form */
+  .form-box{
+    flex:1 1 350px;
+  }
+  .form-box h2{ color:var(--accent-dark); margin-bottom:12px; }
+  label{font-size:14px; color:var(--muted); display:block; margin-bottom:2px;}
+  input, textarea{
+    width:100%; padding:10px;
+    border:1px solid #d7e8d4;
+    border-radius:8px;
+    margin-bottom:10px;
+  }
+  textarea{ resize:none; height:90px; }
+
+  /* Summary section */
+  .summary{
+    flex:1 1 250px;
+    background:#e6f9e7;
+    padding:16px;
+    border-radius:10px;
+    border:1px solid rgba(0,0,0,0.05);
+  }
+  .summary h3{ color:var(--accent-dark); }
+  .summary-item{
+    display:flex; justify-content:space-between;
+    padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.06);
+  }
+  .total{
+    font-size:18px; font-weight:700;
+    display:flex; justify-content:space-between;
+    padding-top:10px; color:var(--accent-dark);
+  }
+
+  .btn{
+    background:var(--accent);
+    color:#fff;
+    width:100%; padding:14px;
+    border:0; border-radius:10px;
+    font-weight:700; 
+    margin-top:15px;
+    cursor:pointer;
+  }
+  .btn:hover{ background:var(--accent-dark); }
+
+</style>
+</head>
+
+<body>
+
+<h1>Checkout – Enter Delivery Details</h1>
+
+<div class="container">
+
+  <!-- Address Form -->
+  <div class="form-box">
+    <h2>Delivery Address</h2>
+
+    <label>Full Name</label>
+    <input type="text" id="name" placeholder="Enter your full name" required>
+
+    <label>Mobile Number</label>
+    <input type="text" id="mobile" placeholder="Enter mobile number" required>
+
+    <label>Complete Address</label>
+    <textarea id="address" placeholder="House Number, Area, Street..." required></textarea>
+
+    <label>City</label>
+    <input type="text" id="city" placeholder="City name" required>
+
+    <label>Pincode</label>
+    <input type="text" id="pincode" placeholder="Enter pincode" required>
+
+    <button class="btn" onclick="placeOrder()">Continue to Payment</button>
+  </div>
+
+  <!-- Order Summary -->
+  <div class="summary">
+    <h3>Order Summary</h3>
+    <div id="summaryList"></div>
+    <div class="total">
+      <span>Total</span>
+      <span id="summaryTotal">₹0</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Load cart from localStorage
+const cartKey = "destro_cart_v2";
+let cart = JSON.parse(localStorage.getItem(cartKey)) || {};
+
+function formatCurrency(n){ return '₹'+Number(n).toFixed(0) }
+
+function loadSummary(){
+  const container = document.getElementById("summaryList");
+  const items = Object.values(cart);
+  
+  if(!items.length){
+    container.innerHTML = `<p>No items in cart.</p>`;
+    return;
+  }
+
+  let html = "";
+  let total = 0;
+
+  items.forEach(i=>{
+    html += `<div class="summary-item">
+              <span>${i.name} × ${i.qty}</span>
+              <span>${formatCurrency(i.qty*i.price)}</span>
+            </div>`;
+    total += i.qty * i.price;
+  });
+
+  container.innerHTML = html;
+  document.getElementById("summaryTotal").textContent = formatCurrency(total);
+}
+
+// Form Submit
+function placeOrder() {
+    const userInfo = {
+        name: document.getElementById("name").value,
+        mobile: document.getElementById("mobile").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        pincode: document.getElementById("pincode").value
+    };
+
+    localStorage.setItem("destro_user_info", JSON.stringify(userInfo));
+    window.location.href = "payment.html"; 
+}
+
+loadSummary();
+</script>
+
+</body>
+</html>
