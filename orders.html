@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders | Destro Fruits</title>
+<style>
+:root{--green:#2ecc71;}
+body{font-family:Arial;background:#eafaf1;padding:20px;}
+h2{color:#145a32;}
+.order{background:#fff;padding:15px;border-radius:12px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,.07);}
+.order h3{color:#145a32;}
+.toggle{cursor:pointer;color:#000;font-weight:700;margin-top:8px;}
+.items{display:none;margin-top:12px;padding:10px;background:#eefff1;border-radius:10px;}
+.status{font-weight:700;}
+</style>
+</head>
+<body>
+<h2>My Orders</h2>
+<div id="orderList"></div>
+
+<script>
+let orders=JSON.parse(localStorage.getItem("destro_orders")||"[]");
+// Sort latest first
+orders.sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+const box=document.getElementById("orderList");
+if(!orders.length) box.innerHTML="No Orders Found!";
+
+orders.forEach(o=>{
+  const d=document.createElement("div");
+  d.className="order";
+  d.innerHTML=`
+    <h3>Order: ${o.id}</h3>
+    <p><b>Date:</b> ${o.date}</p>
+    <p class="status"><b>Status:</b> ${o.status}</p>
+    <p><b>Total:</b> ₹${o.total}</p>
+    <div class="toggle" onclick="showItems('${o.id}')">View Items ▼</div>
+    <div id="item_${o.id}" class="items">
+      ${o.items.map(i=>`<div>${i.name} × ${i.qty} — ₹${i.qty*i.price}</div>`).join("")}
+    </div>
+  `;
+  box.appendChild(d);
+});
+
+function showItems(id){
+  const el=document.getElementById("item_"+id);
+  el.style.display = el.style.display==="block"?"none":"block";
+}
+</script>
+</body>
+</html>
